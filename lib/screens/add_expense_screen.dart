@@ -30,8 +30,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   @override
   void initState() {
     super.initState();
-    // Par défaut, tous les membres participent
     _selectedParticipants = List.from(widget.members);
+    _amountController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -83,6 +85,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   // Ne pas oublier d'appeler setState pour mettre à jour l'interface
   void _toggleParticipant(Member member) {
     // À COMPLÉTER PAR L'ÉTUDIANT
+    setState(() {
+      if (_selectedParticipants.contains(member)) {
+        _selectedParticipants.remove(member);
+      } else {
+        _selectedParticipants.add(member);
+      }
+    });
   }
 
   @override
@@ -304,6 +313,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   Widget _buildPreviewCard() {
     // À COMPLÉTER PAR L'ÉTUDIANT
     // Indice: Créer un Container avec une Card affichant les informations
+    final double amount = double.tryParse(_amountController.text) ?? 0.0;
+    final int count = _selectedParticipants.length;
+    final double share = count > 0 ? amount / count : 0.0;
+
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -311,11 +324,34 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.blue.shade200),
       ),
-      child: Center(
-        child: Text(
-          'Aperçu à implémenter',
-          style: TextStyle(color: Colors.blue.shade700),
-        ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Montant total', style: TextStyle(color: Colors.blue.shade700)),
+              Text('${amount.toStringAsFixed(2)} €', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Participants', style: TextStyle(color: Colors.blue.shade700)),
+              Text('$count', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Divider(color: Colors.blue.shade200),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Part par personne', 
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade800)),
+              Text('${share.toStringAsFixed(2)} €', 
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue.shade900)),
+            ],
+          ),
+        ],
       ),
     );
   }

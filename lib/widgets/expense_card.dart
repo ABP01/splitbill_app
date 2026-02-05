@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../models/expense_model.dart';
 
 // PARTIE B - REFACTORING : Ce widget est mal structuré et contient du code répétitif
@@ -19,6 +20,62 @@ class ExpenseCard extends StatelessWidget {
     this.onTap,
     this.onDelete,
   });
+
+  Widget _infoRow({
+    required String label,
+    required String value,
+    required Color color,
+    IconData? icon,
+    String? leadingText,
+    String? trailingText,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: icon != null
+                  ? Icon(icon, size: 14, color: color)
+                  : Text(
+                      leadingText ?? "",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+            ),
+          ),
+          SizedBox(width: 8),
+          if (label.isNotEmpty)
+            Text(
+              '$label ',
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+            ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
+          if (trailingText != null)
+            Text(
+              trailingText,
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+            ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,135 +120,42 @@ class ExpenseCard extends StatelessWidget {
                     ),
                     SizedBox(width: 8),
                     // Montant
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        '${expense.amount.toStringAsFixed(2)} €',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700,
-                        ),
+                    Text(
+                      '${expense.amount.toStringAsFixed(2)} €',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green.shade700,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: 8),
                 // Ligne "Payé par"
-                Row(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: Colors.green.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          expense.paidBy.name[0].toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green.shade700,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Payé par ',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    Text(
-                      expense.paidBy.name,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
+                _infoRow(
+                  label: 'Payé par',
+                  value: expense.paidBy.name,
+                  color: Colors.green.shade700,
+                  leadingText: expense.paidBy.name[0].toUpperCase(),
                 ),
-                SizedBox(height: 8),
                 // Ligne "Partagé entre"
-                Row(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.people,
-                          size: 14,
-                          color: Colors.orange.shade700,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Partagé entre ',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    Text(
-                      '${expense.splitBetween.length} personnes',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Text(
-                      ' (${expense.getSharePerPerson().toStringAsFixed(2)} €/pers.)',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
-                      ),
-                    ),
-                  ],
-                ),
                 SizedBox(height: 8),
-                // Ligne date
-                Row(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: Colors.purple.withOpacity(0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.calendar_today,
-                          size: 14,
-                          color: Colors.purple.shade700,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      DateFormat('dd MMM yyyy', 'fr_FR').format(expense.createdAt),
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
+                _infoRow(
+                  label: 'Partagé entre',
+                  value: '${expense.splitBetween.length} personnes',
+                  color: Colors.orange.shade700,
+                  icon: Icons.people,
+                  trailingText:
+                      ' (${expense.getSharePerPerson().toStringAsFixed(2)} €/pers.)',
+                ),
+                _infoRow(
+                  label: '', //
+                  value: DateFormat(
+                    'dd MMM yyyy',
+                    'fr_FR',
+                  ).format(expense.createdAt),
+                  color: Colors.purple.shade700,
+                  icon: Icons.calendar_today,
                 ),
                 // Bouton de suppression
                 if (onDelete != null) ...[
